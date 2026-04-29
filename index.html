@@ -1,0 +1,330 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Summit DC 26 — Répartition des chambres</title>
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;background:#f5f4f0;color:#1a1a1a;min-height:100vh}
+@media print{
+  header .header-actions{display:none}
+  .view-tabs{display:none}
+  body{background:#fff}
+  .room-card{break-inside:avoid}
+  .pool{display:none}
+  .night-block{display:block!important}
+}
+header{background:#fff;border-bottom:1px solid #e5e3dc;padding:14px 24px;display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;z-index:100}
+.header-title{font-size:15px;font-weight:600;color:#1a1a1a}
+.header-sub{font-size:12px;color:#888;margin-top:2px}
+.header-actions{display:flex;gap:8px;align-items:center}
+.btn{font-size:12px;padding:7px 14px;border-radius:8px;border:1px solid #ddd;background:#fff;color:#1a1a1a;cursor:pointer;font-weight:500;transition:all 0.15s;white-space:nowrap;display:inline-flex;align-items:center;gap:6px}
+.btn:hover{background:#f5f4f0;border-color:#bbb}
+.btn-success{background:#0f6e56;color:#fff;border-color:#0f6e56}
+.btn-success:hover{background:#085041}
+.btn-dark{background:#1a1a1a;color:#fff;border-color:#1a1a1a}
+.btn-dark:hover{background:#333}
+.btn svg{width:13px;height:13px;fill:none;stroke:currentColor;stroke-width:2;stroke-linecap:round;stroke-linejoin:round;flex-shrink:0}
+main{max-width:1140px;margin:0 auto;padding:24px 20px}
+.view-tabs{display:flex;gap:4px;margin-bottom:20px;background:#fff;border:1px solid #e5e3dc;border-radius:10px;padding:4px;width:fit-content}
+.vtab{font-size:13px;padding:7px 16px;border-radius:7px;border:none;background:transparent;color:#888;cursor:pointer;font-weight:500;transition:all 0.15s}
+.vtab.active{background:#1a1a1a;color:#fff}
+.night-block{margin-bottom:32px}
+.night-header{font-size:13px;font-weight:600;color:#1a1a1a;margin-bottom:14px;padding:10px 14px;background:#fff;border:1px solid #e5e3dc;border-radius:10px;display:flex;align-items:center;gap:8px}
+.night-header .night-pill{font-size:11px;padding:3px 8px;border-radius:6px;font-weight:600}
+.night-j1 .night-pill{background:#dbeafe;color:#1e40af}
+.night-j2 .night-pill{background:#f1efe8;color:#5f5e5a}
+.section-label{font-size:10px;font-weight:600;color:#aaa;letter-spacing:0.08em;text-transform:uppercase;margin:16px 0 8px;padding-bottom:6px;border-bottom:1px solid #ebe9e2}
+.rooms-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(195px,1fr));gap:9px;margin-bottom:4px}
+.room-card{background:#fff;border:1px solid #e5e3dc;border-radius:11px;padding:11px 13px;min-height:64px;transition:border-color 0.15s,background 0.15s}
+.room-card.drag-over{border-color:#1a1a1a;background:#f0efe9}
+.room-label{font-size:10px;font-weight:600;color:#bbb;margin-bottom:8px;display:flex;align-items:center;justify-content:space-between;letter-spacing:0.04em;text-transform:uppercase}
+.room-count{font-size:10px;background:#f5f4f0;color:#999;padding:1px 5px;border-radius:4px}
+.person-chip{display:flex;align-items:center;gap:7px;padding:4px 3px;cursor:grab;border-radius:7px;transition:background 0.1s}
+.person-chip:active{cursor:grabbing}
+.person-chip:hover{background:#f5f4f0}
+.person-chip+.person-chip{border-top:1px solid #f0efe9}
+.person-chip.dragging{opacity:0.3}
+.avatar{width:26px;height:26px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:9px;font-weight:600;flex-shrink:0}
+.av-f{background:#dbeafe;color:#1e40af}
+.av-m{background:#f1efe8;color:#5f5e5a}
+.av-c{background:#d1fae5;color:#065f46}
+.av-g{background:#fef3c7;color:#92400e}
+.chip-name{font-size:12px;color:#1a1a1a;flex:1;font-weight:500;line-height:1.3}
+.chip-badge{font-size:9px;padding:2px 5px;border-radius:4px;white-space:nowrap;flex-shrink:0;font-weight:500}
+.badge-warn{background:#fef3c7;color:#92400e}
+.badge-danger{background:#fee2e2;color:#991b1b}
+.badge-info{background:#dbeafe;color:#1e40af}
+.guest-card{border-color:#f59e0b;background:#fffbeb}
+.pool{background:#fafaf8;border:1.5px dashed #d5d3cc;border-radius:10px;padding:11px 13px;min-height:44px;margin-top:12px;transition:all 0.15s}
+.pool.drag-over{border-color:#1a1a1a;background:#f0efe9}
+.pool-label{font-size:10px;color:#bbb;margin-bottom:6px;font-weight:600;text-transform:uppercase;letter-spacing:0.06em}
+.pool-chips{display:flex;flex-wrap:wrap;gap:5px}
+.mini-chip{font-size:11px;padding:3px 9px;border-radius:20px;background:#fff;border:1px solid #ddd;color:#1a1a1a;cursor:grab;font-weight:500;transition:border-color 0.15s}
+.mini-chip:hover{border-color:#888}
+.mini-chip.dragging{opacity:0.3}
+.divider{border:none;border-top:1px solid #e5e3dc;margin:28px 0}
+.legend{display:flex;gap:12px;flex-wrap:wrap;margin-bottom:16px}
+.legend-item{display:flex;align-items:center;gap:5px;font-size:11px;color:#999}
+.legend-dot{width:9px;height:9px;border-radius:50%}
+.recap-overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,0.5);z-index:200;align-items:center;justify-content:center}
+.recap-overlay.show{display:flex}
+.recap-modal{background:#fff;border-radius:16px;padding:24px;width:560px;max-width:90vw;max-height:80vh;overflow-y:auto}
+.recap-modal h3{font-size:15px;font-weight:600;margin-bottom:16px}
+.recap-text{font-size:11px;font-family:monospace;background:#f5f4f0;padding:14px;border-radius:8px;white-space:pre-wrap;line-height:1.7;color:#333;max-height:420px;overflow-y:auto}
+.recap-actions{display:flex;justify-content:flex-end;gap:8px;margin-top:14px}
+.toast{position:fixed;bottom:24px;left:50%;transform:translateX(-50%);background:#1a1a1a;color:#fff;font-size:13px;padding:10px 20px;border-radius:20px;opacity:0;transition:opacity 0.3s;z-index:300;pointer-events:none}
+.toast.show{opacity:1}
+</style>
+</head>
+<body>
+<header>
+  <div>
+    <div class="header-title">Summit DC 26 — Répartition des chambres</div>
+    <div class="header-sub">4 &amp; 5 juin 2026 · Bassin d'Arcachon · Hôtel Arcanse</div>
+  </div>
+  <div class="header-actions">
+    <button class="btn" onclick="showRecap()">
+      <svg viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/><polyline points="10 9 9 9 8 9"/></svg>
+      Récap
+    </button>
+    <button class="btn btn-success" onclick="copyRecap()">
+      <svg viewBox="0 0 24 24"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>
+      Copier
+    </button>
+    <button class="btn btn-dark" onclick="exportPDF()">
+      <svg viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="12" y1="18" x2="12" y2="12"/><line x1="9" y1="15" x2="15" y2="15"/></svg>
+      Exporter PDF
+    </button>
+  </div>
+</header>
+
+<main>
+  <div class="view-tabs">
+    <button class="vtab active" onclick="setView('all')">Vue globale</button>
+    <button class="vtab" onclick="setView('j1')">03/06 · J-1</button>
+    <button class="vtab" onclick="setView('j2')">04/06 · Summit</button>
+  </div>
+  <div class="legend">
+    <div class="legend-item"><div class="legend-dot" style="background:#dbeafe"></div>Femme</div>
+    <div class="legend-item"><div class="legend-dot" style="background:#f1efe8"></div>Homme</div>
+    <div class="legend-item"><div class="legend-dot" style="background:#d1fae5"></div>Couple</div>
+    <div class="legend-item"><div class="legend-dot" style="background:#fef3c7"></div>Invité dîner</div>
+  </div>
+  <div id="view-all"></div>
+  <div id="view-j1" style="display:none"></div>
+  <div id="view-j2" style="display:none"></div>
+</main>
+
+<div class="recap-overlay" id="recap-overlay" onclick="hideRecap(event)">
+  <div class="recap-modal">
+    <h3>Récapitulatif complet</h3>
+    <div class="recap-text" id="recap-content"></div>
+    <div class="recap-actions">
+      <button class="btn" onclick="hideRecap()">Fermer</button>
+      <button class="btn btn-dark" onclick="copyRecap()">Copier</button>
+    </div>
+  </div>
+</div>
+<div class="toast" id="toast"></div>
+
+<script>
+const PEOPLE={
+  SR:{name:'Sofia Rivalland',city:'Marseille',gender:'f',badge:'J-1',badgeType:'info'},
+  FM:{name:'Fanny Mingant',city:'Landerneau',gender:'f',badge:'J-1',badgeType:'info'},
+  IM:{name:'Ibtissem Menai',city:'Chalon-sur-Saône',gender:'f',badge:'sans viande',badgeType:'warn'},
+  DS:{name:'Dorian Smit',city:'Marseille',gender:'m',badge:'J-1',badgeType:'info'},
+  EB:{name:'Émilie Benistand',city:'Lyon',gender:'f',badge:'végan',badgeType:'warn'},
+  AL:{name:'Aude Lejuez',city:'Arras',gender:'f',badge:null},
+  CB:{name:'Claire Brosset',city:'Nantes',gender:'f',badge:null},
+  CH:{name:'Claire Huyghues des Etages',city:'Bordeaux',gender:'f',badge:null},
+  JMi:{name:'Jordan Millot',city:'Bordeaux',gender:'m',badge:null},
+  RK:{name:'Robin Komiwes',city:'Paris',gender:'m',badge:'végétarien',badgeType:'warn'},
+  BT:{name:'Benjamin Tierny',city:'Paris',gender:'m',badge:null},
+  MM:{name:'Maxime Marousez',city:'Lille',gender:'m',badge:null},
+  RB:{name:'Romain Barrat',city:'Lille',gender:'m',badge:'allergie aubergine',badgeType:'danger'},
+  ML:{name:'Matthieu Lavergne',city:'Lille',gender:'m',badge:null},
+  SP:{name:'Sébastien Pubert',city:'Nantes',gender:'m',badge:'végétarien',badgeType:'warn'},
+  VL:{name:'Valentin Legrand',city:'Bordeaux',gender:'m',badge:'allergie volaille',badgeType:'danger'},
+  AM:{name:'Alexandre Meinder',city:'Angers',gender:'m',badge:null},
+  FN:{name:'Franck Nouvion',city:'Béthune',gender:'m',badge:null},
+  LD:{name:'Lucas Dubernard',city:'Bordeaux',gender:'m',badge:null},
+  SC:{name:'Simon Correard',city:'Lille',gender:'m',badge:null},
+  TD:{name:'Tanguy Deshayes',city:'Lille',gender:'m',badge:null},
+  JMo:{name:'Jules Monjarret',city:'Dax',gender:'m',badge:null},
+  JS:{name:'Jean-Sébastien Bourdon',city:'Carcassonne',gender:'m',badge:null},
+  ST:{name:'Stéphane De La Torre',city:'Bordeaux',gender:'m',badge:'apnée du sommeil',badgeType:'warn'},
+  HB:{name:'Habib Bouzguenda',city:'Béthune',gender:'m',badge:'halal',badgeType:'warn'},
+  JJ:{name:'Johann Josset',city:'Nantes',gender:'m',badge:'végétarien',badgeType:'warn'},
+  YD:{name:'Yves Delcourte',city:'Avignon',gender:'m',badge:null},
+};
+
+let state={
+  j1:[
+    {id:'j1-f1',label:'Chambre J-1 · F',people:['SR']},
+    {id:'j1-f2',label:'Chambre J-1 · F',people:['FM']},
+    {id:'j1-f3',label:'Chambre J-1 · F',people:['IM']},
+    {id:'j1-h1',label:'Chambre J-1 · H',people:['DS']},
+  ],
+  j2:[
+    {id:'f1',label:'Suite F1',section:'f',capacity:2,people:['SR','EB']},
+    {id:'f2',label:'Suite F2',section:'f',capacity:2,people:['FM','AL']},
+    {id:'f3',label:'Suite F3',section:'f',capacity:2,people:['AL','IM']},
+    {id:'sf',label:'Single F',section:'sf',capacity:1,people:['CB']},
+    {id:'couple',label:'Suite couple',section:'couple',capacity:2,people:['CH','JMi']},
+    {id:'h1',label:'Suite H1',section:'h',capacity:2,people:['RK','BT']},
+    {id:'h2',label:'Suite H2',section:'h',capacity:2,people:['MM','DS']},
+    {id:'h3',label:'Suite H3',section:'h',capacity:2,people:['RB','ML']},
+    {id:'h4',label:'Suite H4',section:'h',capacity:2,people:['SP','VL']},
+    {id:'h5',label:'Suite H5',section:'h',capacity:2,people:['AM','FN']},
+    {id:'h6',label:'Suite H6',section:'h',capacity:2,people:['LD','SC']},
+    {id:'h7',label:'Suite H7',section:'h',capacity:2,people:['TD','JMo']},
+    {id:'h8',label:'Suite H8',section:'h',capacity:1,people:['JS']},
+    {id:'sh1',label:'Single H1',section:'sh',capacity:1,people:['ST']},
+    {id:'sh2',label:'Single H2',section:'sh',capacity:1,people:['HB']},
+    {id:'sh3',label:'Single H3',section:'sh',capacity:1,people:['JJ']},
+    {id:'sh4',label:'Single H4',section:'sh',capacity:1,people:['YD']},
+  ],
+  poolJ1:[],poolJ2:[],
+};
+state.j2.find(r=>r.id==='f3').people=['AL','IM'];
+state.j2.find(r=>r.id==='sf').people=['CB'];
+
+let currentView='all',dragging=null;
+
+function initials(n){return n.split(' ').map(w=>w[0]).join('').substring(0,2).toUpperCase()}
+function avClass(pid){
+  if(pid==='CH'||pid==='JMi')return'av-c';
+  const p=PEOPLE[pid];return p&&p.gender==='f'?'av-f':'av-m';
+}
+function chipHTML(pid,night){
+  const p=PEOPLE[pid];if(!p)return'';
+  const b=p.badge?`<span class="chip-badge badge-${p.badgeType}">${p.badge}</span>`:'';
+  return `<div class="person-chip" draggable="true" data-pid="${pid}" data-night="${night}" ondragstart="startDrag(event)" ondragend="endDrag(event)">
+    <div class="avatar ${avClass(pid)}">${initials(p.name)}</div>
+    <span class="chip-name">${p.name}</span>${b}
+  </div>`;
+}
+function miniChipHTML(pid,night){
+  const p=PEOPLE[pid];if(!p)return'';
+  return `<span class="mini-chip" draggable="true" data-pid="${pid}" data-night="${night}" data-from-pool="true" ondragstart="startDrag(event)" ondragend="endDrag(event)">${p.name}</span>`;
+}
+function roomCard(r,night){
+  const cap=r.capacity>1?`<span class="room-count">${r.people.length}/${r.capacity}</span>`:'';
+  return `<div class="room-card" data-room="${r.id}"
+    ondragover="event.preventDefault();this.classList.add('drag-over')"
+    ondragleave="this.classList.remove('drag-over')"
+    ondrop="dropToRoom(event,'${r.id}','${night}')">
+    <div class="room-label">${r.label}${cap}</div>
+    ${r.people.map(pid=>chipHTML(pid,night)).join('')}
+  </div>`;
+}
+function poolHTML(night,pool){
+  return `<div class="pool" id="pool-${night}"
+    ondragover="event.preventDefault();this.classList.add('drag-over')"
+    ondragleave="this.classList.remove('drag-over')"
+    ondrop="dropToPool(event,'${night}')">
+    <div class="pool-label">Non attribués</div>
+    <div class="pool-chips">${pool.map(pid=>miniChipHTML(pid,night)).join('')}</div>
+  </div>`;
+}
+function j1HTML(){
+  return `<div class="night-block night-j1">
+    <div class="night-header"><span class="night-pill">03/06</span>Nuit J-1 — Arrivants avant le summit</div>
+    <div class="section-label">Chambres J-1</div>
+    <div class="rooms-grid">${state.j1.map(r=>roomCard(r,'j1')).join('')}</div>
+    ${poolHTML('j1',state.poolJ1)}
+  </div>`;
+}
+function j2HTML(){
+  const labels={f:'Suites twin — femmes',sf:'Single — femmes',couple:'Suite couple',h:'Suites twin — hommes',sh:'Singles — hommes'};
+  let html=`<div class="night-block night-j2">
+    <div class="night-header"><span class="night-pill">04/06</span>Nuit Summit</div>
+    <div class="section-label">Invitée dîner</div>
+    <div class="rooms-grid">
+      <div class="room-card guest-card">
+        <div class="room-label">Dîner uniquement</div>
+        <div class="person-chip">
+          <div class="avatar av-g">IT</div>
+          <span class="chip-name">Isaure Tsassis</span>
+          <span class="chip-badge badge-warn">rien de cru · grossesse</span>
+        </div>
+      </div>
+    </div>`;
+  ['f','sf','couple','h','sh'].forEach(sec=>{
+    const rooms=state.j2.filter(r=>r.section===sec);
+    html+=`<div class="section-label">${labels[sec]}</div><div class="rooms-grid">${rooms.map(r=>roomCard(r,'j2')).join('')}</div>`;
+  });
+  html+=poolHTML('j2',state.poolJ2)+'</div>';
+  return html;
+}
+function render(){
+  document.getElementById('view-all').innerHTML=j1HTML()+'<hr class="divider">'+j2HTML();
+  document.getElementById('view-j1').innerHTML=j1HTML();
+  document.getElementById('view-j2').innerHTML=j2HTML();
+}
+function setView(v){
+  currentView=v;
+  ['all','j1','j2'].forEach(k=>{
+    document.getElementById('view-'+k).style.display=k===v?'block':'none';
+  });
+  document.querySelectorAll('.vtab').forEach((t,i)=>{
+    t.classList.toggle('active',['all','j1','j2'][i]===v);
+  });
+}
+function startDrag(e){
+  dragging={pid:e.currentTarget.dataset.pid,night:e.currentTarget.dataset.night};
+  setTimeout(()=>e.currentTarget.classList.add('dragging'),0);
+}
+function endDrag(e){
+  document.querySelectorAll('.room-card,.pool').forEach(el=>el.classList.remove('drag-over'));
+  dragging=null;render();
+}
+function removeFromState(pid,night){
+  if(night==='j1'){state.j1.forEach(r=>{r.people=r.people.filter(p=>p!==pid)});state.poolJ1=state.poolJ1.filter(p=>p!==pid)}
+  else{state.j2.forEach(r=>{r.people=r.people.filter(p=>p!==pid)});state.poolJ2=state.poolJ2.filter(p=>p!==pid)}
+}
+function dropToRoom(e,roomId,night){
+  e.preventDefault();if(!dragging)return;
+  const pid=dragging.pid;removeFromState(pid,night);
+  const rooms=night==='j1'?state.j1:state.j2;
+  const room=rooms.find(r=>r.id===roomId);
+  if(room&&!room.people.includes(pid))room.people.push(pid);
+  render();
+}
+function dropToPool(e,night){
+  e.preventDefault();if(!dragging)return;
+  const pid=dragging.pid;removeFromState(pid,night);
+  if(night==='j1'){if(!state.poolJ1.includes(pid))state.poolJ1.push(pid)}
+  else{if(!state.poolJ2.includes(pid))state.poolJ2.push(pid)}
+  render();
+}
+function buildRecap(){
+  let l=['SUMMIT DC 26 — RÉPARTITION DES CHAMBRES','4 & 5 juin 2026 · Hôtel Arcanse · Bassin d\'Arcachon',''];
+  l.push('── NUIT DU 03/06 — J-1 ──────────────────');
+  state.j1.forEach(r=>{l.push('  '+r.label+' : '+(r.people.map(p=>PEOPLE[p]?.name||p).join(', ')||'—'))});
+  l.push('');
+  l.push('── NUIT DU 04/06 — SUMMIT ───────────────');
+  l.push('  [Dîner uniquement] Isaure Tsassis (rien de cru — grossesse)');
+  ['f','sf','couple','h','sh'].forEach(sec=>{
+    state.j2.filter(r=>r.section===sec).forEach(r=>{l.push('  '+r.label+' : '+(r.people.map(p=>PEOPLE[p]?.name||p).join(', ')||'—'))});
+  });
+  if(state.poolJ2.length)l.push('\n  Non attribués : '+state.poolJ2.map(p=>PEOPLE[p]?.name||p).join(', '));
+  return l.join('\n');
+}
+function showRecap(){document.getElementById('recap-content').textContent=buildRecap();document.getElementById('recap-overlay').classList.add('show')}
+function hideRecap(e){if(!e||e.target===document.getElementById('recap-overlay'))document.getElementById('recap-overlay').classList.remove('show')}
+function copyRecap(){navigator.clipboard.writeText(buildRecap());showToast('Récap copié');document.getElementById('recap-overlay').classList.remove('show')}
+function showToast(msg){const t=document.getElementById('toast');t.textContent=msg;t.classList.add('show');setTimeout(()=>t.classList.remove('show'),2500)}
+function exportPDF(){
+  ['view-all','view-j1','view-j2'].forEach(id=>document.getElementById(id).style.removeProperty('display'));
+  document.querySelectorAll('.pool').forEach(p=>p.style.display='none');
+  window.print();
+  document.querySelectorAll('.pool').forEach(p=>p.style.removeProperty('display'));
+  ['all','j1','j2'].forEach(k=>document.getElementById('view-'+k).style.display=k===currentView?'block':'none');
+}
+render();
+</script>
+</body>
+</html>
