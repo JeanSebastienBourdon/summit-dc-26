@@ -8,12 +8,34 @@
 *{box-sizing:border-box;margin:0;padding:0}
 body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;background:#f5f4f0;color:#1a1a1a;min-height:100vh}
 @media print{
+  @page{margin:15mm 12mm;size:A4}
+  header{position:static!important;border:none;padding:8px 0 12px;margin-bottom:8px;box-shadow:none}
   header .header-actions{display:none}
-  .view-tabs{display:none}
-  body{background:#fff}
-  .room-card{break-inside:avoid}
-  .pool{display:none}
-  .night-block{display:block!important}
+  .view-tabs{display:none!important}
+  .legend{margin-bottom:10px}
+  body{background:#fff;font-size:11px}
+  main{padding:0;max-width:100%}
+  #view-all{display:block!important}
+  #view-j1,#view-j2{display:none!important}
+  .pool{display:none!important}
+  .night-block{display:block!important;margin-bottom:16px}
+  .night-header{padding:6px 10px;margin-bottom:8px;background:#f5f4f0!important;-webkit-print-color-adjust:exact;print-color-adjust:exact}
+  .rooms-grid{grid-template-columns:repeat(3,1fr)!important;gap:7px}
+  .room-card{break-inside:avoid;page-break-inside:avoid;padding:8px 10px;min-height:auto;border:1px solid #ddd!important}
+  .guest-card{border-color:#f59e0b!important;background:#fffbeb!important;-webkit-print-color-adjust:exact;print-color-adjust:exact}
+  .section-label{margin:10px 0 6px}
+  .divider{margin:14px 0}
+  .avatar{-webkit-print-color-adjust:exact;print-color-adjust:exact}
+  .av-f{background:#dbeafe!important;color:#1e40af!important}
+  .av-m{background:#f1efe8!important;color:#5f5e5a!important}
+  .av-c{background:#d1fae5!important;color:#065f46!important}
+  .av-g{background:#fef3c7!important;color:#92400e!important}
+  .chip-badge{-webkit-print-color-adjust:exact;print-color-adjust:exact}
+  .badge-warn{background:#fef3c7!important;color:#92400e!important}
+  .badge-danger{background:#fee2e2!important;color:#991b1b!important}
+  .badge-info{background:#dbeafe!important;color:#1e40af!important}
+  .night-j1 .night-pill{background:#dbeafe!important;color:#1e40af!important;-webkit-print-color-adjust:exact;print-color-adjust:exact}
+  .night-j2 .night-pill{background:#f1efe8!important;color:#5f5e5a!important;-webkit-print-color-adjust:exact;print-color-adjust:exact}
 }
 header{background:#fff;border-bottom:1px solid #e5e3dc;padding:14px 24px;display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;z-index:100}
 .header-title{font-size:15px;font-weight:600;color:#1a1a1a}
@@ -322,13 +344,7 @@ function showRecap(){document.getElementById('recap-content').textContent=buildR
 function hideRecap(e){if(!e||e.target===document.getElementById('recap-overlay'))document.getElementById('recap-overlay').classList.remove('show')}
 function copyRecap(){navigator.clipboard.writeText(buildRecap());showToast('Récap copié');document.getElementById('recap-overlay').classList.remove('show')}
 function showToast(msg){const t=document.getElementById('toast');t.textContent=msg;t.classList.add('show');setTimeout(()=>t.classList.remove('show'),2500)}
-function exportPDF(){
-  ['view-all','view-j1','view-j2'].forEach(id=>document.getElementById(id).style.removeProperty('display'));
-  document.querySelectorAll('.pool').forEach(p=>p.style.display='none');
-  window.print();
-  document.querySelectorAll('.pool').forEach(p=>p.style.removeProperty('display'));
-  ['all','j1','j2'].forEach(k=>document.getElementById('view-'+k).style.display=k===currentView?'block':'none');
-}
+function exportPDF(){window.print();}
 render();
 </script>
 </body>
