@@ -115,6 +115,10 @@ main{max-width:1140px;margin:0 auto;padding:24px 20px}
   <div id="view-all"></div>
   <div id="view-j1" style="display:none"></div>
   <div id="view-j2" style="display:none"></div>
+
+<div style="margin-top:32px;padding:14px 18px;background:#fffbeb;border:1px solid #f59e0b;border-radius:12px;font-size:12px;color:#92400e;line-height:1.6">
+  <strong>⚠️ Note activité sportive</strong> — Lisa Comelli et Claire Huyghues des Etages ne pourront pas participer à l'activité sportive de l'après-midi. Nous apprécierions une contre-proposition pour occuper leur après-midi pendant ce temps.
+</div>
 </main>
 
 <div class="recap-overlay" id="recap-overlay" onclick="hideRecap(event)">
@@ -133,17 +137,18 @@ main{max-width:1140px;margin:0 auto;padding:24px 20px}
 const PEOPLE={
   SR:{name:'Sofia Rivalland',city:'Marseille',gender:'f',badge:'J-1',badgeType:'info'},
   FM:{name:'Fanny Mingant',city:'Landerneau',gender:'f',badge:'J-1',badgeType:'info'},
-  IM:{name:'Ibtissem Menai',city:'Chalon-sur-Saône',gender:'f',badge:'sans viande',badgeType:'warn'},
+  IM:{name:'Ibtissem Menai',city:'Chalon-sur-Saône',gender:'f',badge:'pas de viande · poisson OK',badgeType:'warn'},
   DS:{name:'Dorian Smit',city:'Marseille',gender:'m',badge:'J-1',badgeType:'info'},
   EB:{name:'Émilie Benistand',city:'Lyon',gender:'f',badge:'végan',badgeType:'warn'},
   AL:{name:'Aude Lejuez',city:'Arras',gender:'f',badge:null},
   CB:{name:'Claire Brosset',city:'Nantes',gender:'f',badge:null},
+  LC:{name:'Lisa Comelli',city:'Chessy',gender:'f',badge:null},
   CH:{name:'Claire Huyghues des Etages',city:'Bordeaux',gender:'f',badge:null},
   JMi:{name:'Jordan Millot',city:'Bordeaux',gender:'m',badge:null},
   RK:{name:'Robin Komiwes',city:'Paris',gender:'m',badge:'végétarien',badgeType:'warn'},
   BT:{name:'Benjamin Tierny',city:'Paris',gender:'m',badge:null},
   MM:{name:'Maxime Marousez',city:'Lille',gender:'m',badge:null},
-  RB:{name:'Romain Barrat',city:'Lille',gender:'m',badge:'allergie aubergine',badgeType:'danger'},
+  RB:{name:'Romain Barrat',city:'Lille',gender:'m',badge:'allergie sévère aubergine',badgeType:'danger'},
   ML:{name:'Matthieu Lavergne',city:'Lille',gender:'m',badge:null},
   SP:{name:'Sébastien Pubert',city:'Nantes',gender:'m',badge:'végétarien',badgeType:'warn'},
   VL:{name:'Valentin Legrand',city:'Bordeaux',gender:'m',badge:'allergie volaille',badgeType:'danger'},
@@ -169,7 +174,7 @@ let state={
   ],
   j2:[
     {id:'f1',label:'Suite F1',section:'f',capacity:2,people:['SR','EB']},
-    {id:'f2',label:'Suite F2',section:'f',capacity:2,people:['FM','AL']},
+    {id:'f2',label:'Suite F2',section:'f',capacity:2,people:['FM','LC']},
     {id:'f3',label:'Suite F3',section:'f',capacity:2,people:['AL','IM']},
     {id:'sf',label:'Single F',section:'sf',capacity:1,people:['CB']},
     {id:'couple',label:'Suite couple',section:'couple',capacity:2,people:['CH','JMi']},
